@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Social Media Privacy Risk Assessment"
+description = "A defensive privacy-awareness tool that evaluates self-reported social-media practices with synthetic-safe scoring, findings, recommendations, improvement simulation, and downloadable reports."
+version = "1.0.0"
+id = "artifacts/privacy-risk-assessment"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 21098
+
+[services.development]
+run = "pnpm --filter @workspace/privacy-risk-assessment run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/privacy-risk-assessment", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/privacy-risk-assessment/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "21098"
+BASE_PATH = "/"

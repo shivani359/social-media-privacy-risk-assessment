@@ -1,0 +1,473 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: assessment
+    description: Privacy assessment operations
+  - name: dashboard
+    description: Aggregate dashboard operations
+  - name: checklist
+    description: Privacy checklist operations
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+  /assessment:
+    post:
+      operationId: createAssessment
+      tags: [assessment]
+      summary: Create a privacy assessment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AssessmentInput"
+      responses:
+        "201":
+          description: Assessment created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Assessment"
+        "400":
+          description: Invalid assessment input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /assessment/{id}:
+    get:
+      operationId: getAssessment
+      tags: [assessment]
+      summary: Get an assessment by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Assessment
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Assessment"
+        "404":
+          description: Assessment not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /assessment/simulate-improvement:
+    post:
+      operationId: simulateImprovement
+      tags: [assessment]
+      summary: Simulate safer settings without saving an assessment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SimulationInput"
+      responses:
+        "200":
+          description: Simulation result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SimulationResult"
+        "400":
+          description: Invalid simulation input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /dashboard/stats:
+    get:
+      operationId: getDashboardStats
+      tags: [dashboard]
+      summary: Get synthetic aggregate dashboard statistics
+      responses:
+        "200":
+          description: Dashboard statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardStats"
+  /privacy-checklist:
+    get:
+      operationId: getPrivacyChecklist
+      tags: [checklist]
+      summary: Get the printable privacy checklist
+      responses:
+        "200":
+          description: Checklist items
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChecklistResponse"
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required: [error]
+    AssessmentInput:
+      type: object
+      required:
+        - profileVisibility
+        - searchEngineVisibility
+        - followersVisibility
+        - friendsListVisibility
+        - phonePublic
+        - emailPublic
+        - birthdayPublic
+        - homeInfoPublic
+        - workplacePublic
+        - educationPublic
+        - relationshipPublic
+        - realTimeLocation
+        - geotagging
+        - checkIns
+        - homeLocationExposure
+        - workLocationExposure
+        - travelPlans
+        - frequentLocationPatterns
+        - postsVisibility
+        - historicalPostsReviewed
+        - photoMetadataAware
+        - photoDocumentExposure
+        - unknownConnections
+        - friendFollowerReview
+        - tagReviewEnabled
+        - anyoneCanTag
+        - autoTaggedPosts
+        - unknownMentions
+        - mfaEnabled
+        - uniquePassword
+        - passwordManagerUsed
+        - loginAlertsEnabled
+        - recoveryInfoReviewed
+        - activeSessionsReviewed
+        - unknownDevicesChecked
+        - thirdPartyAppsReviewed
+        - unusedAppsPresent
+        - unnecessaryPermissions
+        - suspiciousLinksAwareness
+        - verificationCodesShared
+        - personalInfoInMessages
+        - impersonationAwareness
+        - suspiciousGiveaways
+        - oldAccountsReviewed
+        - publicCommentsReviewed
+        - privacySettingsReviewed
+      properties:
+        profileVisibility:
+          type: string
+          enum: [public, friends, private]
+        searchEngineVisibility:
+          type: boolean
+        followersVisibility:
+          type: string
+          enum: [public, friends, private]
+        friendsListVisibility:
+          type: string
+          enum: [public, friends, private]
+        phonePublic:
+          type: boolean
+        emailPublic:
+          type: boolean
+        birthdayPublic:
+          type: boolean
+        homeInfoPublic:
+          type: boolean
+        workplacePublic:
+          type: boolean
+        educationPublic:
+          type: boolean
+        relationshipPublic:
+          type: boolean
+        realTimeLocation:
+          type: boolean
+        geotagging:
+          type: boolean
+        checkIns:
+          type: boolean
+        homeLocationExposure:
+          type: boolean
+        workLocationExposure:
+          type: boolean
+        travelPlans:
+          type: boolean
+        frequentLocationPatterns:
+          type: boolean
+        postsVisibility:
+          type: string
+          enum: [public, friends, private]
+        historicalPostsReviewed:
+          type: boolean
+        photoMetadataAware:
+          type: boolean
+        photoDocumentExposure:
+          type: boolean
+        unknownConnections:
+          type: string
+          enum: [often, sometimes, rarely]
+        friendFollowerReview:
+          type: boolean
+        tagReviewEnabled:
+          type: boolean
+        anyoneCanTag:
+          type: boolean
+        autoTaggedPosts:
+          type: boolean
+        unknownMentions:
+          type: boolean
+        mfaEnabled:
+          type: boolean
+        uniquePassword:
+          type: boolean
+        passwordManagerUsed:
+          type: boolean
+        loginAlertsEnabled:
+          type: boolean
+        recoveryInfoReviewed:
+          type: boolean
+        activeSessionsReviewed:
+          type: boolean
+        unknownDevicesChecked:
+          type: boolean
+        thirdPartyAppsReviewed:
+          type: boolean
+        unusedAppsPresent:
+          type: boolean
+        unnecessaryPermissions:
+          type: boolean
+        suspiciousLinksAwareness:
+          type: string
+          enum: [high, medium, low]
+        verificationCodesShared:
+          type: boolean
+        personalInfoInMessages:
+          type: boolean
+        impersonationAwareness:
+          type: string
+          enum: [high, medium, low]
+        suspiciousGiveaways:
+          type: boolean
+        oldAccountsReviewed:
+          type: boolean
+        publicCommentsReviewed:
+          type: boolean
+        privacySettingsReviewed:
+          type: boolean
+    CategoryScore:
+      type: object
+      properties:
+        category:
+          type: string
+        score:
+          type: integer
+        label:
+          type: string
+      required: [category, score, label]
+    Finding:
+      type: object
+      properties:
+        id:
+          type: string
+        category:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        severity:
+          type: string
+          enum: [immediate, important, good_practice]
+      required: [id, category, title, description, severity]
+    Recommendation:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        detail:
+          type: string
+        priority:
+          type: string
+          enum: [immediate, important, good_practice]
+      required: [id, title, detail, priority]
+    Assessment:
+      type: object
+      properties:
+        assessmentId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        overallScore:
+          type: integer
+        riskLevel:
+          type: string
+          enum: [LOW, MODERATE, HIGH, CRITICAL]
+        categoryScores:
+          type: array
+          items:
+            $ref: "#/components/schemas/CategoryScore"
+        findings:
+          type: array
+          items:
+            $ref: "#/components/schemas/Finding"
+        recommendations:
+          type: array
+          items:
+            $ref: "#/components/schemas/Recommendation"
+        controlsEnabled:
+          type: integer
+        highRiskCategories:
+          type: integer
+      required:
+        - assessmentId
+        - createdAt
+        - overallScore
+        - riskLevel
+        - categoryScores
+        - findings
+        - recommendations
+        - controlsEnabled
+        - highRiskCategories
+    SimulationInput:
+      type: object
+      required: [assessment, improvements]
+      properties:
+        assessment:
+          $ref: "#/components/schemas/AssessmentInput"
+        improvements:
+          type: array
+          items:
+            type: string
+            enum:
+              - makeContactPrivate
+              - reduceLocationSharing
+              - enableMfa
+              - enableTagReview
+              - reviewThirdPartyApps
+              - reviewHistoricalPosts
+              - reviewPrivacySettings
+              - rejectUnknownConnections
+      additionalProperties: false
+    SimulationResult:
+      type: object
+      properties:
+        currentScore:
+          type: integer
+        newScore:
+          type: integer
+        reduction:
+          type: integer
+        currentRiskLevel:
+          type: string
+          enum: [LOW, MODERATE, HIGH, CRITICAL]
+        newRiskLevel:
+          type: string
+          enum: [LOW, MODERATE, HIGH, CRITICAL]
+        changedControls:
+          type: array
+          items:
+            type: string
+      required:
+        - currentScore
+        - newScore
+        - reduction
+        - currentRiskLevel
+        - newRiskLevel
+        - changedControls
+    DashboardStats:
+      type: object
+      properties:
+        totalAssessments:
+          type: integer
+        averageScore:
+          type: integer
+        riskDistribution:
+          type: object
+          additionalProperties:
+            type: integer
+        topWeaknesses:
+          type: array
+          items:
+            type: object
+            properties:
+              label:
+                type: string
+              count:
+                type: integer
+            required: [label, count]
+        controlCoverage:
+          type: array
+          items:
+            type: object
+            properties:
+              label:
+                type: string
+              enabled:
+                type: integer
+              total:
+                type: integer
+            required: [label, enabled, total]
+      required:
+        - totalAssessments
+        - averageScore
+        - riskDistribution
+        - topWeaknesses
+        - controlCoverage
+    ChecklistItem:
+      type: object
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        category:
+          type: string
+      required: [id, label, category]
+    ChecklistResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChecklistItem"
+      required: [items]
+
